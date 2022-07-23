@@ -1,6 +1,7 @@
 package com.coolteam74.notification.kafka;
 
 import com.coolteam74.mq.notification.core.IMessageFactory;
+import com.coolteam74.mq.notification.core.model.NotificationMessage;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +16,11 @@ class KafkaMessageFactoryImplTest {
 
     @Test
     public void whenExistsTopicProperty() {
-        messageFactory.sendMessage();
+        NotificationMessage message = NotificationMessage.builder()
+                .topic("test")
+                .body("Hello World!")
+                .build();
+        messageFactory.sendMessage(message);
     }
 
 }

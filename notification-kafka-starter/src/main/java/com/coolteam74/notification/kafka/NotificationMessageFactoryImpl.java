@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
 public class NotificationMessageFactoryImpl implements IMessageFactory {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final MessageChannel channel;
+    private final StreamBridge streamBridge;
 
     @Override
     public void sendMessage(NotificationMessage... messages) {
@@ -27,15 +28,15 @@ public class NotificationMessageFactoryImpl implements IMessageFactory {
         Stream.of(messages).forEach(request -> {
             NotificationMessage message = null;
             try {
-                NotificationMessage.NotificationMessageBuilder<?, ?> messageBuilder = NotificationMessage.builder()
-                        .topic(request.getTopic());
-                messageBuilder.body(objectMapper.writeValueAsString(request));
-                message = messageBuilder.build();
+                message = NotificationMessage.builder()
+                .topic(request.getTopic())
+                .body(objectMapper.writeValueAsString(request))
+                .build();
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
 
-            channel.send(MessageBuilder.withPayload(message).build());
+            streamBridge.send("test", MessageBuilder.withPayload(message).build());
         });
     }
 }

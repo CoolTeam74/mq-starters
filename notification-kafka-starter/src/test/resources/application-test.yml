@@ -5,3 +5,15 @@ logging:
         web: DEBUG
     com:
       coolteam74: DEBUG
+
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  cloud:
+    stream:
+      bindings:
+        publish-out-0:
+          destination: test
+      kafka:
+        binder:
+          brokers: localhost:9092
